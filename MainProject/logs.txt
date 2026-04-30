@@ -1,0 +1,10 @@
+{"time_start": "2026-04-27T13:34:21.597", "node": "A", "event": "send", "type": "Known_Fullset", "targets": ["B"], "delay": 0.8163}
+{"time_start": "2026-04-27T13:34:21.598", "node": "A", "event": "send", "type": "Known_Fullset", "targets": ["C"], "delay": 0.8245}
+{"time_start": "2026-04-27T13:34:21.600", "node": "A", "event": "send", "type": "Known_Fullset", "targets": ["D"], "delay": 0.9606}
+{"time_start": "2026-04-27T13:34:22.432", "node": "C", "event": "send", "type": "Known_Fullset", "targets": ["E"], "delay": 0.8357}
+{"time_start": "2026-04-27T13:34:29.685", "node": "E", "event": "send", "type": "Request", "targets": ["B"], "delay": 1.5739}
+{"time_start": "2026-04-27T13:34:29.687", "node": "E", "event": "send", "type": "Request", "targets": ["C"], "delay": 1.5582}
+{"time_start": "2026-04-27T13:34:29.689", "node": "E", "event": "send", "type": "Request", "targets": ["D"], "delay": 1.5686}
+{"time_start": "2026-04-27T13:34:36.302", "node": "C", "event": "send", "type": "Packets", "targets": ["E"], "delay": 0.8387}
+{"time_start": "2026-04-27T13:34:36.315", "node": "D", "event": "send", "type": "Packets", "targets": ["E"], "delay": 0.7041}
+{"time_start": "2026-04-27T13:34:36.321", "node": "B", "event": "send", "type": "Packets", "targets": ["E"], "delay": 1.3586}
