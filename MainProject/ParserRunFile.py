@@ -86,25 +86,62 @@ def process_all_data(data_dir='Data', packages_dir='Packages', package_size=1024
     # data: [WindowsPath('Data/Habr-Info.txt'), ...] для всех файлов
     
     if not data:
-        print(f"В папке '{data_dir}' нет новых данных!")
+        print(f"В папке '{data_dir}' нет данных!")
         return
     
     print(f"Найдено файлов: {len(data)}")
     print("="*60)
     
-    
-    storage_path = Path(r'C:\Users\user\MainProject\Data_storage')
-    storage_path.mkdir(parents=True, exist_ok=True)  # Создаём папку, если её нет
-    for i, data_path in enumerate(data, 1): # data_path: Data\Habr-Info.txt
+    for i, data_path in enumerate(data, 1):
         print(f"\n[{i}/{len(data)}] Обработка: {data_path.name}")
         split_data_to_packages(data_path, packages_dir, package_size)
-        
-        print(f"data_path: {data_path}")
-        target = storage_path / data[i-1].name
-        data_path.rename(target)
-        
+    
     print("="*60)
     print(f"Готово! Все изображения разбиты на пакеты в папке '{packages_dir}'")
+
+"""
+
+def main():
+    # import argparse
+    
+    # parser = argparse.ArgumentParser(description='Разбиение изображений на пакеты фиксированного размера')
+    # parser.add_argument('--mode', '-m', choices=['split', 'reconstruct', 'both'], 
+    #                    default='split', help='Режим работы')
+    # parser.add_argument('--input', '-i', default='Images', 
+    #                    help='Папка с исходными изображениями (для split)')
+    # parser.add_argument('--output', '-o', default='Packages', 
+    #                    help='Папка для пакетов/восстановления')
+    # parser.add_argument('--size', '-s', type=int, default=1024, 
+    #                    help='Размер пакета в байтах')
+    # parser.add_argument('--package-folder', '-p', 
+    #                    help='Конкретная папка с пакетами для восстановления')
+    
+    # args = parser.parse_args()
+    
+    # if args.mode in ['split', 'both']:
+    #     print("=== РЕЖИМ РАЗБИЕНИЯ ===")
+    #     process_all_images(args.input, args.output, args.size)
+    
+    # if args.mode in ['reconstruct', 'both']:
+    #     print("\n=== РЕЖИМ ВОССТАНОВЛЕНИЯ ===")
+    #     if args.package_folder:
+    #         reconstruct_image(args.package_folder)
+    #     else:
+    #         reconstruct_all_images(args.output)      
+
+    
+    _data_dir = 'Data'
+    _packages_dir = 'Packages'
+    _package_size = 60
+    
+    print("=== РЕЖИМ РАЗБИЕНИЯ ===")
+    process_all_data(_data_dir, _packages_dir, _package_size)
+    
+
+if __name__ == "__main__":
+    main()
+    
+"""    
 
 def reconstruct_data(package_dir, output_path=None):
     """
@@ -180,3 +217,41 @@ def reconstruct_all_data(packages_dir='Packages'):
     
     print("="*60)
     print("Готово! Все изображения восстановлены")
+    
+
+
+"""
+    
+def main():
+    # import argparse
+    
+    # parser = argparse.ArgumentParser(description='Разбиение изображений на пакеты фиксированного размера')
+    # parser.add_argument('--mode', '-m', choices=['split', 'reconstruct', 'both'], 
+    #                    default='split', help='Режим работы')
+    # parser.add_argument('--input', '-i', default='Images', 
+    #                    help='Папка с исходными изображениями (для split)')
+    # parser.add_argument('--output', '-o', default='Packages', 
+    #                    help='Папка для пакетов/восстановления')
+    # parser.add_argument('--size', '-s', type=int, default=1024, 
+    #                    help='Размер пакета в байтах')
+    # parser.add_argument('--package-folder', '-p', 
+    #                    help='Конкретная папка с пакетами для восстановления')
+    
+    # args = parser.parse_args()   
+    
+    # if args.mode in ['reconstruct', 'both']:
+    #     print("\n=== РЕЖИМ ВОССТАНОВЛЕНИЯ ===")
+    #     if args.package_folder:
+    #         reconstruct_image(args.package_folder)
+    #     else:
+    #         reconstruct_all_images(args.output)
+
+    _packages_dir = 'Packages'
+    # _output_path = '...'
+    
+    reconstruct_all_data(_packages_dir)
+
+if __name__ == "__main__":
+    main()
+    
+"""

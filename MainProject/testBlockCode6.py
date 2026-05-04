@@ -33,45 +33,6 @@ sock2.bind(('', node2_port))
 sock2.settimeout(1.0)
 # sock2.setblocking(False)
 
-# def send():
-#     data_to_send = 'Hello world'
-#     time.sleep(1)
-#     while True:
-#         try:
-            
-#             print(data_to_send)
-            
-#             data_to_send_json = json.dumps({'data':data_to_send}).encode()
-#             sock1.sendto(data_to_send_json, ('127.0.0.1', node2_port)) # node1 -> node2
-#             time.sleep(3)
-#         except Exception as e:
-#             print(f"Ошибка отправки в {node2_port}: {e}")
-#             time.sleep(3)
-#             continue
-                
-# def recieve():
-#     while True:
-#         try:
-#             data, addr = sock2.recvfrom(4096)
-#             msg = json.loads(data.decode())
-            
-#             print(f"Получено сообщение от {addr}:\n{msg}")
-            
-#         except socket.timeout:
-#             continue
-#         except ConnectionResetError as cre:  # ← СПЕЦИФИЧЕСКОЕ ИСКЛЮЧЕНИЕ ПЕРВЫМ
-#             print(f"Подключение к несуществующему узлу <{cre}>")
-#             import traceback
-#             traceback.print_exc()
-#             continue
-#         except json.JSONDecodeError as e:
-#             print(f"Ошибка декодирования JSON: {e}")
-#             continue
-#         except Exception as e:  # ← ОБЩЕЕ ИСКЛЮЧЕНИЕ ПОСЛЕДНИМ
-#             print(f"Ошибка приема: {type(e).__name__}: {e}")
-#             continue
-
-
 def UpdatePackets():
     Data_path = Path(r'C:\Users\user\MainProject\Data')
     Packeges_path = Path(r'C:\Users\user\MainProject\Packeges')
@@ -86,20 +47,26 @@ def UpdatePackets():
         send()
         time.sleep(5) # Raise to 15-30
 
-def send(data):
-    data_to_send = 'Hello world'
-    time.sleep(1)
-    while True:
-        try:
-            with open(Path('Packages/00001/00012.bin'), 'rb') as f:
-                data_to_send = f.read()
+def send():
+    
+    my_packages_path = Path(r"C:\Users\user\MainProject\Packeges")
+    try:
+        package_folders = [d for d in my_packages_path.iterdir() if d.is_dir()]        
+        if not package_folders:
+            print("There aren't packages")
+            return
+        
+        for folder in package_folders:
             
-            sock1.sendto(data_to_send, ('127.0.0.1', node2_port)) # node1 -> node2
-            time.sleep(3)
-        except Exception as e:
-            print(f"Ошибка отправки в {node2_port}: {e}")
-            time.sleep(3)
-            continue
+            
+        with open(Path('Packages/00001/00012.bin'), 'rb') as f:
+            data = f.read()
+        
+        sock1.sendto(data, ('127.0.0.1', node2_port)) # node1 -> node2
+        time.sleep(3)
+    except Exception as e:
+        print(f"Ошибка отправки в {node2_port}: {e}")
+        time.sleep(3)
 
 def recieve():
     while True:
