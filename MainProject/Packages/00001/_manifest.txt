@@ -1,3 +1,3 @@
-original_file: Habr-Info.txt
-original_path: Data\Habr-Info.txt
+original_file: Habr-Info1.txt
+original_path: Data\Habr-Info1.txt
 package_size: 60
