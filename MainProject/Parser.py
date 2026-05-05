@@ -25,12 +25,12 @@ def split_data_to_packages(data_path, output_base_dir, package_size_bytes=1024):
     package_dir = Path(output_base_dir) / f"{next_number:05d}"  # 00001, 00002, etc.
     package_dir.mkdir(parents=True)
     
-    # Сохраняем информацию о соответствии папки и исходного файла
-    manifest_file = package_dir / "_manifest.txt"
-    with open(manifest_file, 'w') as f:
-        f.write(f"original_file: {Path(data_path).name}\n")
-        f.write(f"original_path: {data_path}\n")
-        f.write(f"package_size: {package_size_bytes}\n")
+    # # Сохраняем информацию о соответствии папки и исходного файла
+    # manifest_file = package_dir / "_manifest.txt"
+    # with open(manifest_file, 'w') as f:
+    #     f.write(f"original_file: {Path(data_path).name}\n")
+    #     f.write(f"original_path: {data_path}\n")
+    #     f.write(f"package_size: {package_size_bytes}\n")
     
     # Читаем и разбиваем файл
     with open(data_path, 'rb') as f:
@@ -105,6 +105,8 @@ def process_all_data(data_dir='Data', packages_dir='Packages', package_size=1024
         
     print("="*60)
     print(f"Готово! Все изображения разбиты на пакеты в папке '{packages_dir}'")
+    
+    return
 
 def reconstruct_data(package_dir, output_path=None):
     """
@@ -133,7 +135,7 @@ def reconstruct_data(package_dir, output_path=None):
     
     if not package_files:
         print(f"В папке {package_dir} нет пакетов!")
-        return False
+        return
     
     # Определяем имя выходного файла
     if output_path is None:
@@ -152,7 +154,7 @@ def reconstruct_data(package_dir, output_path=None):
     print(f"  Количество пакетов: {len(package_files)}")
     print(f"  Размер: {output_path.stat().st_size} байт")
     
-    return True
+    return
 
 def reconstruct_all_data(packages_dir='Packages'):
     """

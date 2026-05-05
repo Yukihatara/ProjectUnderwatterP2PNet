@@ -1,14 +1,32 @@
+"""
+должна быть функция send(), которая принимает на вход:
+    
+    data - данные,
+    
+    # Разберем ваш пример: '!BBHII'
+
+    # '!' - сетевой порядок байт (big-endian)
+    # 'B' - unsigned char (1 байт, число 0-255)
+    # 'B' - unsigned char (1 байт)
+    # 'H' - unsigned short (2 байта, число 0-65535)
+    # 'I' - unsigned int (4 байта, число 0-4294967295)
+    # 'I' - unsigned int (4 байта)
+    
+    # Итого: 1+1+2+4+4 = 12 байт
+
+"""     
 import os
 from pathlib import Path
 import socket
 import threading
-import keyboard
 import time
 from pathlib import Path
 
+import struct
+
 import json
 
-from parser import process_all_data, split_data_to_packages, reconstruct_all_data, reconstruct_data
+from Parser import process_all_data, split_data_to_packages, reconstruct_all_data, reconstruct_data
 
 
 # files_bin = [f for f in Path('Packages/00001').iterdir() if f.is_file() and f.suffix == '.bin']
@@ -33,23 +51,32 @@ sock2.bind(('', node2_port))
 sock2.settimeout(1.0)
 # sock2.setblocking(False)
 
+
+"""
+    Path(...).unlink() - удаляет объект Path из файловой системы
+    Path(...).glob('*ext') - поиск всех фалов с заданным расширением (например .txt)
+"""
+
 def UpdatePackets():
-    Data_path = Path(r'C:\Users\user\MainProject\Data')
-    Packeges_path = Path(r'C:\Users\user\MainProject\Packeges')
+    
+    time.sleep(1) # Raise to 15-30 in practice
+    Packeges_path = Path('Packages')
         
     while True:
-        result = process_all_data(data_dir='Data', packages_dir='Packages', package_size=60)
+        process_all_data(data_dir='Data', packages_dir='Packages', package_size=60)
         if any(Packeges_path.iterdir()):
             print("There are contents in the Packeges folder")
         else:
             print("There are not contents in the Packeges folder")
+            time.sleep(5)
+            return
         
-        send()
-        time.sleep(5) # Raise to 15-30
+        send() # After data collecting
+        time.sleep(10) # Raise to 15-30 in practice
+
 
 def send():
-    
-    my_packages_path = Path(r"C:\Users\user\MainProject\Packeges")
+    my_packages_path = Path(r"C:\Users\user\MainProject\Packages")    
     try:
         package_folders = [d for d in my_packages_path.iterdir() if d.is_dir()]        
         if not package_folders:
@@ -57,12 +84,31 @@ def send():
             return
         
         for folder in package_folders:
+            """
+            Тут необходимо для каждого исходника брать пакеты, заворчаивать их
+            в обертку paiload, чтобы правильно отправлять данные с указанием,
+            какой пакеты к чему относится
+            """
+            packages = sorted(folder.glob('*.bin'))
+            num_packages = len(packages)
             
+            for pkg_file in packages:
+                with open(pkg_file, 'rb') as f:
+                    data = f.read()
             
-        with open(Path('Packages/00001/00012.bin'), 'rb') as f:
-            data = f.read()
+            # Добавим простой заголовок
+            # [4 байта - номер пакета][данные]
+            packet_num = int(pkg_file.stem) # идетификатор
+            
+            print(packet_num)
+            
+            headers = struct.pack('!II', packet_num, num_packages)
         
-        sock1.sendto(data, ('127.0.0.1', node2_port)) # node1 -> node2
+            data_to_send = headers + data
+            # Отправка пакетов
+            sock1.sendto(data_to_send, ('127.0.0.1', node2_port)) # node1 -> node2
+            time.sleep(0.1)
+            
         time.sleep(3)
     except Exception as e:
         print(f"Ошибка отправки в {node2_port}: {e}")
@@ -74,8 +120,11 @@ def recieve():
             data, addr = sock2.recvfrom(4096) # msg is byte
             # msg = data.decode('utf-8')
             
-            print(f"Получено сообщение от {addr}:\n{data}")
-            
+            if len(data) > 4:
+                packet_num = struct.unpack('!I', data[:4])[0]
+                num_packages = struct.unpack('!I', data[4:8])[0]
+                print(f"Get packet {packet_num}. All packets {num_packages}")
+                
         except socket.timeout:
             continue
         except ConnectionResetError as cre:  # ← СПЕЦИФИЧЕСКОЕ ИСКЛЮЧЕНИЕ ПЕРВЫМ
@@ -93,6 +142,8 @@ def recieve():
 
 # threading.Thread(target=send, daemon=True).start()        
 threading.Thread(target=recieve, daemon=True).start()
+threading.Thread(target=UpdatePackets, daemon=True).start()
+
 
 while True:
     time.sleep(1)
