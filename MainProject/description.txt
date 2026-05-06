@@ -1,0 +1,22 @@
+"""
+должна быть функция send(), которая принимает на вход:
+    
+    data - данные,
+    
+    # Разберем ваш пример: '!BBHII'
+
+    # '!' - сетевой порядок байт (big-endian)
+    # 'B' - unsigned char (1 байт, число 0-255)
+    # 'B' - unsigned char (1 байт)
+    # 'H' - unsigned short (2 байта, число 0-65535)
+    # 'I' - unsigned int (4 байта, число 0-4294967295)
+    # 'I' - unsigned int (4 байта)
+    
+    # Итого: 1+1+2+4+4 = 12 байт
+    
+    # Path(...).unlink() - удаляет объект Path из файловой системы
+    # Path(...).glob('*ext') - поиск всех фалов с заданным расширением (например .txt)
+    
+    # storage_path = Path(r'C:\Users\user\MainProject\Data_storage')
+    # storage_path.mkdir(parents=True, exist_ok=True)  # Создаём папку, если её нет
+"""

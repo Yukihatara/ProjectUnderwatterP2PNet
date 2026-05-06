@@ -1,36 +1,14 @@
-"""
-должна быть функция send(), которая принимает на вход:
-    
-    data - данные,
-    
-    # Разберем ваш пример: '!BBHII'
-
-    # '!' - сетевой порядок байт (big-endian)
-    # 'B' - unsigned char (1 байт, число 0-255)
-    # 'B' - unsigned char (1 байт)
-    # 'H' - unsigned short (2 байта, число 0-65535)
-    # 'I' - unsigned int (4 байта, число 0-4294967295)
-    # 'I' - unsigned int (4 байта)
-    
-    # Итого: 1+1+2+4+4 = 12 байт
-
-"""     
 import os
 from pathlib import Path
+
+import struct 
+import json
+
 import socket
 import threading
 import time
-from pathlib import Path
-
-import struct
-
-import json
 
 from Parser import process_all_data, split_data_to_packages, reconstruct_all_data, reconstruct_data
-
-
-# files_bin = [f for f in Path('Packages/00001').iterdir() if f.is_file() and f.suffix == '.bin']
-# print(files_bin)
 
 # === Сокет ===
 
@@ -51,29 +29,22 @@ sock2.bind(('', node2_port))
 sock2.settimeout(1.0)
 # sock2.setblocking(False)
 
-
-"""
-    Path(...).unlink() - удаляет объект Path из файловой системы
-    Path(...).glob('*ext') - поиск всех фалов с заданным расширением (например .txt)
-"""
-
 def UpdatePackets():
     
     time.sleep(1) # Raise to 15-30 in practice
-    Packeges_path = Path('Packages')
+    Data_path = Path('Packages')
         
     while True:
         process_all_data(data_dir='Data', packages_dir='Packages', package_size=60)
-        if any(Packeges_path.iterdir()):
-            print("There are contents in the Packeges folder")
+        if any(Data_path.iterdir()):
+            print("There are contents in the Data folder")
         else:
-            print("There are not contents in the Packeges folder")
+            print("There are not contents in the Data folder")
             time.sleep(5)
             return
         
         send() # After data collecting
         time.sleep(10) # Raise to 15-30 in practice
-
 
 def send():
     my_packages_path = Path(r"C:\Users\user\MainProject\Packages")    
@@ -96,35 +67,45 @@ def send():
                 with open(pkg_file, 'rb') as f:
                     data = f.read()
             
-            # Добавим простой заголовок
-            # [4 байта - номер пакета][данные]
-            packet_num = int(pkg_file.stem) # идетификатор
+                # Добавим простой заголовок
+                # [4 байта - номер пакета][данные]
+                packet_num = int(pkg_file.stem) # идетификатор
             
-            print(packet_num)
+                print(packet_num)
             
-            headers = struct.pack('!II', packet_num, num_packages)
+                headers = struct.pack('!II', packet_num, num_packages)
         
-            data_to_send = headers + data
-            # Отправка пакетов
-            sock1.sendto(data_to_send, ('127.0.0.1', node2_port)) # node1 -> node2
-            time.sleep(0.1)
+                data_to_send = headers + data
+                # Отправка пакетов
+                sock1.sendto(data_to_send, ('127.0.0.1', node2_port)) # node1 -> node2
+                time.sleep(0.1)
             
-        time.sleep(3)
+            time.sleep(3)
+        time.sleep(10)
     except Exception as e:
         print(f"Ошибка отправки в {node2_port}: {e}")
         time.sleep(3)
 
 def recieve():
+    reciver_id = 'E'
+    node_env = Path('node_'+reciver_id)
+    node_Packages = node_env / 'Packages'
     while True:
         try:
-            data, addr = sock2.recvfrom(4096) # msg is byte
-            # msg = data.decode('utf-8')
-            
+            # Get and processing r-data
+            data, addr = sock2.recvfrom(4096) # msg is byte [headers][payload]
             if len(data) > 4:
-                packet_num = struct.unpack('!I', data[:4])[0]
-                num_packages = struct.unpack('!I', data[4:8])[0]
-                print(f"Get packet {packet_num}. All packets {num_packages}")
+                pkg_id = int(struct.unpack('!I', data[:4])[0])
+                package_name = f"{pkg_id}.bin"
+                package_path = node_Packages / package_name
                 
+                # Write r-data to folder as .bin file
+                with open(package_path, 'wb') as pckg_p:
+                    pckg_p.write(data[8:])
+                    
+                number_pkg = struct.unpack('!I', data[4:8])[0]
+                print(f"Get packet {pkg_id}. All packets {number_pkg}")
+
         except socket.timeout:
             continue
         except ConnectionResetError as cre:  # ← СПЕЦИФИЧЕСКОЕ ИСКЛЮЧЕНИЕ ПЕРВЫМ
@@ -139,11 +120,9 @@ def recieve():
             print(f"Ошибка приема: {type(e).__name__}: {e}")
             continue
 
-
 # threading.Thread(target=send, daemon=True).start()        
 threading.Thread(target=recieve, daemon=True).start()
 threading.Thread(target=UpdatePackets, daemon=True).start()
-
 
 while True:
     time.sleep(1)

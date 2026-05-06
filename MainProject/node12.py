@@ -1,18 +1,22 @@
-import argparse
 import socket
 import threading
 import time
-import json
 import math
-from typing import Set, Dict, Any, List, Tuple
 import random
 
+from typing import Set, Dict, Any, List, Tuple
+
 import queue
+from datetime import datetime
 
 import os
+import json
 from pathlib import Path
+import argparse
 
-from datetime import datetime
+from Parser import process_all_data, split_data_to_packages
+from Parser import reconstruct_all_data, reconstruct_data
+from Parser import fileEnvNodeCreate
 
 # === ФИКСИРОВАННЫЕ ПОРТЫ ===
 PORT_MAP = {
@@ -790,7 +794,7 @@ def find_unique_packets(neibors):
     return result, set(sorted(all_unique_packets))
     
 def MainLoop():    
-    time.sleep(10)
+    time.sleep(10) # Ожидание подключения всех узловк среде
     warmup = 0
     print("\n ===Прогреваю сеть===")
     
@@ -821,7 +825,7 @@ def MainLoop():
                 purpose_nodes=list(network_status.get(node_id).get('neibors')), 
                 Route=list(node_id),) # Отправляем сообщение всем в радиусе
                   
-    while True:        
+    while True:
         if is_sink == '1' and temp_data != {}: # Пришла информация о существоании в сети некоторого изображения (индексы его пакетов)
             need_packets = set(temp_data['fullset']) - set(packets)
             if need_packets != set() and network_status[node_id]['neibors'] != {}:        
@@ -837,6 +841,7 @@ def MainLoop():
         time.sleep(30)
 
 # === Запуск ===
+fileEnvNodeCreate(node_id) # Создание фалового окружения перед запуском
 
 # Запускаем поток для записи логов
 logging_thread = threading.Thread(target=log_writer, daemon=True)

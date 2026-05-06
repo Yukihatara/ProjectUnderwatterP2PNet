@@ -22,7 +22,7 @@ def split_data_to_packages(data_path, output_base_dir, package_size_bytes=1024):
     # Нумеруем папки последовательно: 00001, 00002, 00003...
     existing_folders = [d for d in Path(output_base_dir).iterdir() if d.is_dir()]
     next_number = len(existing_folders) + 1
-    package_dir = Path(output_base_dir) / f"{next_number:05d}"  # 00001, 00002, etc.
+    package_dir = Path(output_base_dir) / f"{next_number}"  # 1, 2, etc.  <-- Folders
     package_dir.mkdir(parents=True)
     
     # # Сохраняем информацию о соответствии папки и исходного файла
@@ -44,7 +44,7 @@ def split_data_to_packages(data_path, output_base_dir, package_size_bytes=1024):
                 break
             
             # Сохраняем пакет
-            package_name = f"{package_number:05d}.bin"  # 00001.bin, 00002.bin, ...
+            package_name = f"{package_number}.bin"  # 1.bin, 2.bin, ...
             package_path = package_dir / package_name
             
             with open(package_path, 'wb') as pkg_file:
@@ -182,3 +182,17 @@ def reconstruct_all_data(packages_dir='Packages'):
     
     print("="*60)
     print("Готово! Все изображения восстановлены")
+    
+def fileEnvNodeCreate(node_id):
+    # Создаем фаловое окружение каждом узлу
+    env_node = Path('node_' + node_id) # Путь к файловому окружению
+    packages_storage = env_node / 'Packages' # Путь к папке с пакетами
+    data_storage = env_node / 'Data' # Путь к папке с данными (исходными), если такие есть
+    
+    # Созда папки, если не были созданы ранее
+    env_node.mkdir(parents=True, exist_ok=True)
+    packages_storage.mkdir(parents=True, exist_ok=True)
+    data_storage.mkdir(parents=True, exist_ok=True)
+    
+    print("Файловое окружение было создано")
+    return
