@@ -1,10 +1,94 @@
-{"time_start": "2026-04-27T13:34:21.597", "node": "A", "event": "send", "type": "Known_Fullset", "targets": ["B"], "delay": 0.8163}
-{"time_start": "2026-04-27T13:34:21.598", "node": "A", "event": "send", "type": "Known_Fullset", "targets": ["C"], "delay": 0.8245}
-{"time_start": "2026-04-27T13:34:21.600", "node": "A", "event": "send", "type": "Known_Fullset", "targets": ["D"], "delay": 0.9606}
-{"time_start": "2026-04-27T13:34:22.432", "node": "C", "event": "send", "type": "Known_Fullset", "targets": ["E"], "delay": 0.8357}
-{"time_start": "2026-04-27T13:34:29.685", "node": "E", "event": "send", "type": "Request", "targets": ["B"], "delay": 1.5739}
-{"time_start": "2026-04-27T13:34:29.687", "node": "E", "event": "send", "type": "Request", "targets": ["C"], "delay": 1.5582}
-{"time_start": "2026-04-27T13:34:29.689", "node": "E", "event": "send", "type": "Request", "targets": ["D"], "delay": 1.5686}
-{"time_start": "2026-04-27T13:34:36.302", "node": "C", "event": "send", "type": "Packets", "targets": ["E"], "delay": 0.8387}
-{"time_start": "2026-04-27T13:34:36.315", "node": "D", "event": "send", "type": "Packets", "targets": ["E"], "delay": 0.7041}
-{"time_start": "2026-04-27T13:34:36.321", "node": "B", "event": "send", "type": "Packets", "targets": ["E"], "delay": 1.3586}
+22:33:55.467 | A | Отправка Hello | ALL | None
+22:33:55.468 | A | Отправка Hello | ALL | None
+22:33:55.468 | A | Отправка Hello | ALL | None
+22:33:55.587 | C | Получил Hello | A | None
+22:33:55.596 | B | Получил Hello | A | None
+22:33:55.600 | D | Получил Hello | A | None
+22:33:57.466 | B | Отправка Hello | ALL | None
+22:33:57.467 | B | Отправка Hello | ALL | None
+22:33:57.468 | B | Отправка Hello | ALL | None
+22:33:57.616 | A | Получил Hello | B | None
+22:33:57.634 | C | Получил Hello | B | None
+22:33:57.640 | E | Получил Hello | B | None
+22:33:59.476 | C | Отправка Hello | ALL | None
+22:33:59.476 | C | Отправка Hello | ALL | None
+22:33:59.477 | C | Отправка Hello | ALL | None
+22:33:59.477 | C | Отправка Hello | ALL | None
+22:33:59.567 | E | Получил Hello | C | None
+22:33:59.597 | A | Получил Hello | C | None
+22:33:59.599 | B | Получил Hello | C | None
+22:33:59.606 | D | Получил Hello | C | None
+22:34:01.491 | D | Отправка Hello | ALL | None
+22:34:01.492 | D | Отправка Hello | ALL | None
+22:34:01.492 | D | Отправка Hello | ALL | None
+22:34:01.597 | E | Получил Hello | D | None
+22:34:01.622 | C | Получил Hello | D | None
+22:34:01.631 | A | Получил Hello | D | None
+22:34:03.512 | E | Отправка Hello | ALL | None
+22:34:03.513 | E | Отправка Hello | ALL | None
+22:34:03.514 | E | Отправка Hello | ALL | None
+22:34:03.625 | D | Получил Hello | E | None
+22:34:03.632 | C | Получил Hello | E | None
+22:34:03.633 | B | Получил Hello | E | None
+22:34:06.520 | A | Отправка Hello | ALL | None
+22:34:06.521 | A | Отправка Hello | ALL | None
+22:34:06.522 | A | Отправка Hello | ALL | None
+22:34:06.650 | D | Получил Hello | A | None
+22:34:06.659 | C | Получил Hello | A | None
+22:34:06.692 | B | Получил Hello | A | None
+22:34:08.521 | B | Отправка Hello | ALL | None
+22:34:08.522 | B | Отправка Hello | ALL | None
+22:34:08.523 | B | Отправка Hello | ALL | None
+22:34:08.612 | C | Получил Hello | B | None
+22:34:08.646 | E | Получил Hello | B | None
+22:34:08.667 | A | Получил Hello | B | None
+22:34:10.530 | C | Отправка Hello | ALL | None
+22:34:10.531 | C | Отправка Hello | ALL | None
+22:34:10.532 | C | Отправка Hello | ALL | None
+22:34:10.533 | C | Отправка Hello | ALL | None
+22:34:10.636 | B | Получил Hello | C | None
+22:34:10.640 | A | Получил Hello | C | None
+22:34:10.647 | D | Получил Hello | C | None
+22:34:10.655 | E | Получил Hello | C | None
+22:34:12.546 | D | Отправка Hello | ALL | None
+22:34:12.547 | D | Отправка Hello | ALL | None
+22:34:12.548 | D | Отправка Hello | ALL | None
+22:34:12.638 | C | Получил Hello | D | None
+22:34:12.709 | E | Получил Hello | D | None
+22:34:12.717 | A | Получил Hello | D | None
+22:34:14.568 | E | Отправка Hello | ALL | None
+22:34:14.569 | E | Отправка Hello | ALL | None
+22:34:14.570 | E | Отправка Hello | ALL | None
+22:34:14.656 | C | Получил Hello | E | None
+22:34:14.683 | B | Получил Hello | E | None
+22:34:14.691 | D | Получил Hello | E | None
+22:34:28.576 | A | Отправка Known_Fullset | ['B', 'C', 'D'] | None
+22:34:28.577 | A | Отправка Known_Fullset | ['B', 'C', 'D'] | None
+22:34:28.578 | A | Отправка Known_Fullset | ['B', 'C', 'D'] | None
+22:34:28.682 | B | Получил Known_Fullset | A | None
+22:34:28.698 | C | Получил Known_Fullset | A | None
+22:34:28.699 | C | Отправка Known_Fullset | ['E'] | None
+22:34:28.699 | C | Отправка Known_Fullset | ['E'] | None
+22:34:28.700 | C | Отправка Known_Fullset | ['E'] | None
+22:34:28.700 | C | Отправка Known_Fullset | ['E'] | None
+22:34:28.747 | D | Получил Known_Fullset | A | None
+22:34:28.856 | E | Получил Known_Fullset | C | None
+22:34:36.624 | E | Отправка Request | ['B', 'C', 'D'] | [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+22:34:36.625 | E | Отправка Request | ['B', 'C', 'D'] | [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+22:34:36.626 | E | Отправка Request | ['B', 'C', 'D'] | [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+22:34:36.719 | B | Получил Request | E | Получил [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+22:34:36.735 | D | Получил Request | E | Получил [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+22:34:36.737 | C | Получил Request | E | Получил [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+22:34:41.756 | B | Отправка Packets | ['E'] | [8, 9, 10, 7]
+22:34:41.756 | B | Отправка Packets | ['E'] | [8, 9, 10, 7]
+22:34:41.757 | B | Отправка Packets | ['E'] | [8, 9, 10, 7]
+22:34:41.768 | D | Отправка Packets | ['E'] | [1, 2, 3]
+22:34:41.768 | D | Отправка Packets | ['E'] | [1, 2, 3]
+22:34:41.768 | D | Отправка Packets | ['E'] | [1, 2, 3]
+22:34:41.769 | C | Отправка Packets | ['E'] | [4, 5, 6]
+22:34:41.770 | C | Отправка Packets | ['E'] | [4, 5, 6]
+22:34:41.770 | C | Отправка Packets | ['E'] | [4, 5, 6]
+22:34:41.770 | C | Отправка Packets | ['E'] | [4, 5, 6]
+22:34:41.874 | E | Получил Packets | D | Получил [1, 2, 3]
+22:34:41.876 | E | Получил Packets | C | Получил [4, 5, 6]
+22:34:41.891 | E | Получил Packets | B | Получил [8, 9, 10, 7]

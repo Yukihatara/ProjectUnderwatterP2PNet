@@ -93,7 +93,7 @@ def process_all_data(data_dir='Data', packages_dir='Packages', package_size=1024
     print("="*60)
     
     
-    storage_path = Path(r'C:\Users\user\MainProject\Data_storage')
+    storage_path = Path('Data_storage')
     storage_path.mkdir(parents=True, exist_ok=True)  # Создаём папку, если её нет
     for i, data_path in enumerate(data, 1): # data_path: Data\Habr-Info.txt
         print(f"\n[{i}/{len(data)}] Обработка: {data_path.name}")
@@ -107,6 +107,8 @@ def process_all_data(data_dir='Data', packages_dir='Packages', package_size=1024
     print(f"Готово! Все изображения разбиты на пакеты в папке '{packages_dir}'")
     
     return
+
+
 
 def reconstruct_data(package_dir, output_path=None):
     """

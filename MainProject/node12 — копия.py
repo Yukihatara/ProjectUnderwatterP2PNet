@@ -14,9 +14,9 @@ import json
 from pathlib import Path
 import argparse
 
-from Parser import fileEnvNodeCreate
-from Parser import process_all_data
+from Parser import process_all_data, split_data_to_packages
 # from Parser import reconstruct_all_data, reconstruct_data
+from Parser import fileEnvNodeCreate
 
 # === ФИКСИРОВАННЫЕ ПОРТЫ ===
 PORT_MAP = {
@@ -75,6 +75,8 @@ is_sink_value = {
 
 stok = 'E'
 
+cond = None # cond = 'Listening', cond = 'Sending', 
+
 def parse_packets(s: str) -> Set[int]:
     if not s: return set()
     if '-' in s:
@@ -121,9 +123,6 @@ if node_id == 'A':
     temp_data = {'fullset': [1,2,3,4,5,6,7,8,9,10]}
 else:
     temp_data = {}
-    
-temp_data = {}
-
 # Имитация полученного знания о существовании изображения в сети
 # if node_id == 'E': temp_data = {'fullset': [1,2,3,4,5,6,7,8,9,10]}
 
@@ -235,7 +234,7 @@ def send_to(target_id, data, purpose_nodes, Route, msg_type):
     
     if msg_type == 'Hello':
         msg['position'] = position
-        msg['packets_id'] = network_status[node_id]['packets']
+        msg['packets_id'] = list(packets)
         msg['is_sink'] = is_sink
         
     if msg_type == 'Known_Fullset':
@@ -317,16 +316,12 @@ def send_in(msg_type=None, data=None, purpose_nodes=None, Route=None):
     
 def process_request_packets(msg, mode=None):
     print("\n====Обрабатываю запрос====")
-    # def process_request_packets(msg, mode): # mode: SndPck or RtrPck
-    need_packets = set(msg.get('data').get('need_packets')) # list() -> set() = set('1','3'...)
-    need_packets_dict = msg.get('data').get('need_packets') #  {idx: list()}
-    
-    need_packets = set(list(need_packets_dict.values())[0])
-    data_index = list(need_packets_dict)[0]
+# def process_request_packets(msg, mode): # mode: SndPck or RtrPck
+    need_packets = set(msg.get('data').get('need_packets')) # list() -> set()
     
     # Сохраняем полученную инфомрацию в переменную
+    local_stok = msg.get('sender')
     neibors_cluster = msg.get('data').get('neibors') # neibors = {node's_id: {'position': (), 'packets_id': [...]}}
-    
     back_node = msg.get('route').copy()
     
     print(f" Текущий кластер: {list(neibors_cluster)}")
@@ -335,17 +330,13 @@ def process_request_packets(msg, mode=None):
     # Проверяем наличие need_packets у соседей
     around_packets = set() # Сумма пакетов у всех соседей в радиусе
     for node in neibors_cluster:
-        if data_index not in neibors_cluster[node]['packets_id']:
-            neibors_cluster[node]['packets_id'][data_index] = list()
-    
-        around_packets.update(set(neibors_cluster[node]['packets_id'][data_index]))
-            
+        around_packets.update(set(neibors_cluster[node]['packets_id']))
     local_need = need_packets - around_packets
     print(f" Сумма пакетов в кластере: {around_packets}\n Не хватает: {local_need}")
     if local_need != need_packets: # Если "==", кластер не содержит запрошенных пакетов для отправки
         
         # Поиск уникальных пакетов
-        NodeAndUniqPck, all_unique_packets = find_unique_packets(neibors_cluster.copy(), data_index)
+        NodeAndUniqPck, all_unique_packets = find_unique_packets(neibors_cluster.copy())
         
         # Некоторые уникальные пакеты не пересекаются с need_packets - отфильтруем
         for key, value in NodeAndUniqPck.items():
@@ -372,7 +363,7 @@ def process_request_packets(msg, mode=None):
             for pck in remaining_packets:
                 sorted_busy_storage = dict(sorted(busy_storage.items(), key=lambda x: x[1])) # Сортировка по возрастанию загрузки
                 for key, bus_value in sorted_busy_storage.items():
-                        if pck in neibors_cluster[key]['packets_id'][data_index]:                            
+                        if pck in neibors_cluster[key]['packets_id']:                            
                             busy_storage[key] += 1
                             send_storage[key].update(set([pck]))
                             break
@@ -454,7 +445,6 @@ def retranslation(msg, mode):
     
     if node_id in source_and_target:
         print(f"source_and_target:\n{source_and_target}\n\n")
-        
         if mode == 'Fullset':
             msg_to_send_retranslation = {'neibors': whom_to_send,
                                          'fullset': msg.get('data').get('fullset'),}
@@ -537,7 +527,9 @@ def receive_from():
             
             if msg.get('type') == 'Hello':
                 print(f"\nПолучил {msg.get('type')} от {sender}")
-            
+                
+
+                
                 # Обновляем информацию о своих соседях
                 network_status[node_id]['neibors'].update({sender: {'position': msg.get('position'), 
                                                                     'packets_id': msg.get('packets_id'), 
@@ -558,10 +550,8 @@ def receive_from():
                 
                 print(f"\nПолучил {msg.get('type')} от {sender}")
         
-                # Заполняю знания
-                temp_data.update(msg.get('data').get('fullset'))
-                
-                # Если я конечный узел, останавливаюсь
+                # Если я конечный узел, заполняю знания и останавливаюсь
+                temp_data.update( {'fullset': msg.get('data').get('fullset')} )
                 if is_sink == '1':
                     continue
                 
@@ -711,7 +701,7 @@ def receive_from():
             print(f"[{node_id}] Ошибка приема: {type(e).__name__}: {e}")
             continue
 
-def find_unique_packets(neibors, data_index):
+def find_unique_packets(neibors):
     """
     Найти уникальные пакеты у каждого узла в списке.
     
@@ -735,7 +725,7 @@ def find_unique_packets(neibors, data_index):
     all_packets = {}
     all_unique_packets = set()
     for n_id in neibors:
-        all_packets[n_id] = set(neibors[n_id]['packets_id'][data_index])
+        all_packets[n_id] = set(neibors[n_id]['packets_id'])
     
     # 2. Для каждого узла находим уникальные пакеты
     for n_id, n_packets in all_packets.items():
@@ -754,7 +744,7 @@ def find_unique_packets(neibors, data_index):
     return result, set(sorted(all_unique_packets))
     
 def MainLoop():    
-    time.sleep(12) # Ожидание подключения всех узлов среде
+    time.sleep(10) # Ожидание подключения всех узловк среде
     warmup = 0
     print("\n ===Прогреваю сеть===")
     
@@ -774,12 +764,12 @@ def MainLoop():
             break
         
     time.sleep(11)
-    if node_id == 'A':
+    if node_id == 'A' and temp_data != {}:
         print("Я источник с полным набором данных")
     
         # Формируем посылку
         msg_to_send_info = {'neibors': network_status[node_id]['neibors'],
-                            'fullset': network_status[node_id]['packets'],}
+                            'fullset': temp_data['fullset'],}
         send_in(msg_type='Known_Fullset', 
                 data=msg_to_send_info, 
                 purpose_nodes=list(network_status.get(node_id).get('neibors')), 
@@ -787,24 +777,11 @@ def MainLoop():
                   
     while True:
         if is_sink == '1' and temp_data != {}: # Пришла информация о существоании в сети некоторого изображения (индексы его пакетов)
-            
-            # Поиск недостающих пакетов
-            for pkg_I in temp_data:
-                if pkg_I in network_status[node_id]['packets']: # Есть папка, но не хватает пакетов
-                    need_packets = {pkg_I: list(set(temp_data[pkg_I]) - set(network_status[node_id]['packets'][pkg_I]))}
-                    if need_packets != set():
-                        break
-                    continue
-                
-                else: # Нет папки с пакетами
-                    need_packets = {pkg_I: list(temp_data[pkg_I])}
-                    break
-            
-            # Зная, что пара ключ-значение - одна, можно так:
-            if list(need_packets.values())[0] != list() and network_status[node_id]['neibors'] != {}:        
+            need_packets = set(temp_data['fullset']) - set(packets)
+            if need_packets != set() and network_status[node_id]['neibors'] != {}:        
                 msg_request_packets = {
                     'neibors': network_status[node_id]['neibors'],
-                    'need_packets': need_packets,}
+                    'need_packets': list(need_packets),}
                 
                 send_in(msg_type='Request',
                         data=msg_request_packets,
@@ -814,36 +791,8 @@ def MainLoop():
         time.sleep(30)
 
 # === Запуск ===
-fileEnvNodeCreate(node_id) # Создание фалового окружения перед запуском
+# fileEnvNodeCreate(node_id) # Создание фалового окружения перед запуском
 
-"""Предположим, что источник с самого начала имеет некоторые данные data.txt"""
-data_path = 'node_' + node_id + 'Data' # Расположение исходных данным
-Packages_path = 'node_' + node_id + 'Packages' # Расположение будущих пакетов
-
-if any(data_path.iterdir()): # Проверка на наличие новых данных
-    # Вывод в консоль исходных данных
-    with open(Path(data_path / 'Data1.txt'), 'r') as initD:
-        print(f"\n{20*'='}\n{initD.read()}\n{20*'='}\n")
-    
-    process_all_data(data_dir=data_path, packages_dir=Packages_path, package_size=60)
-    
-# Поиск количества пкетов в папке, чтобы понимать размер полного набора
-folders_packages = [fp for fp in Packages_path.iterdir() if fp.is_dir()]
-if len(folders_packages) > 0:
-    for folder_packages in folders_packages:
-        packages = list(folder_packages.glob('*.bin')) # Список путей до бинарников
-        
-        pkg_idx = list() # Список из индексов пакетов, чтобы узлы, могли сказать, какие пакеты у них есть
-        for pkg in packages:
-            pkg_idx.append(pkg.stem)
-            
-        data_info = {folder_packages.parent: pkg_idx} # data_index: ['1','2','3','4','7','9'...]
-        
-        network_status[node_id]['packets'] = data_info
-        
-else:
-    network_status[node_id]['packets'] = {}
-        
 # Запускаем поток для записи логов
 logging_thread = threading.Thread(target=log_writer, daemon=True)
 logging_thread.start()

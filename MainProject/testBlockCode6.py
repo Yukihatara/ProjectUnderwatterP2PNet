@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import struct 
@@ -8,7 +7,7 @@ import socket
 import threading
 import time
 
-from Parser import process_all_data, split_data_to_packages, reconstruct_all_data, reconstruct_data
+from Parser import process_all_data
 
 # === Сокет ===
 
@@ -47,7 +46,7 @@ def UpdatePackets():
         time.sleep(10) # Raise to 15-30 in practice
 
 def send():
-    my_packages_path = Path(r"C:\Users\user\MainProject\Packages")    
+    my_packages_path = Path('Packages')    
     try:
         package_folders = [d for d in my_packages_path.iterdir() if d.is_dir()]        
         if not package_folders:
